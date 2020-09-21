@@ -66,7 +66,7 @@ namespace Client
 
                 ClientId = "client",
                 ClientSecret = "secret",
-                Scope = "api1"
+                Scope = "api2"
             });
 
             if (tokenResponse.IsError)

@@ -8,7 +8,8 @@ namespace IdentityServer.Configuration
         public static IEnumerable<ApiScope> ApiScope =>
             new List<ApiScope>
             {
-                new ApiScope("api1", "My API")
+                new ApiScope("api1", "My API"),
+                new ApiScope("api2", "My API")
             };
 
 
@@ -29,7 +30,24 @@ namespace IdentityServer.Configuration
                     //** scope client can access
                     AllowedScopes = 
                     { 
-                        "api1"
+                        "api1", "api2"
+                    }
+                },
+                new Client
+                {
+                    ClientId = "client mvc",
+                    
+                    //** It will use client id/secret to authenticate
+                    AllowedGrantTypes = GrantTypes.ClientCredentials,
+                    ClientSecrets =
+                    {
+                        new Secret("secretmvc".Sha256())
+                    },
+
+                    //** scope client can access
+                    AllowedScopes = 
+                    { 
+                        "api2"
                     }
                 }
             };
