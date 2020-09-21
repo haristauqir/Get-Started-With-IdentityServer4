@@ -26,12 +26,14 @@ namespace IdentityServer
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddControllersWithViews();
 
             //** Configure Identity server
             services.AddIdentityServer()
+            .AddInMemoryIdentityResources(Config.IdentityResources)
             .AddInMemoryApiScopes(Config.ApiScope)
             .AddInMemoryClients(Config.Clients)
+            .AddTestUsers(TestUsers.Users)
             .AddDeveloperSigningCredential();
         }
 
@@ -47,13 +49,14 @@ namespace IdentityServer
 
             app.UseRouting();
 
-            //app.UseAuthorization();
+            app.UseAuthorization();
 
             app.UseIdentityServer();
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
+                endpoints.MapDefaultControllerRoute()
+                .RequireAuthorization();
             });
         }
     }
