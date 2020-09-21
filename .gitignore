@@ -207,3 +207,7 @@ tools/
 
 # Visual Studio Code workspace options
 .vscode
+
+
+# IdentityServer temp files
+tempkey.jwk
