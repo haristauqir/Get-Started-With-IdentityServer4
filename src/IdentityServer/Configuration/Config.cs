@@ -14,7 +14,7 @@ namespace IdentityServer.Configuration
             new IdentityResources.Profile(),
         };
 
-        public static IEnumerable<ApiScope> ApiScope =>
+        public static IEnumerable<ApiScope> ApiScopes =>
             new List<ApiScope>
             {
                 new ApiScope("api1", "My API")
