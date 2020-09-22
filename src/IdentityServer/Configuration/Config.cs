@@ -17,8 +17,7 @@ namespace IdentityServer.Configuration
         public static IEnumerable<ApiScope> ApiScope =>
             new List<ApiScope>
             {
-                new ApiScope("api1", "My API"),
-                new ApiScope("api2", "My API 2")
+                new ApiScope("api1", "My API")
             };
 
 
@@ -39,7 +38,7 @@ namespace IdentityServer.Configuration
                     //** scope client can access
                     AllowedScopes = 
                     { 
-                        "api1", "api2"
+                        "api1"
                     }
                 },
                 // interactive ASP.NET Core MVC client
@@ -56,10 +55,13 @@ namespace IdentityServer.Configuration
                     // where to redirect to after logout
                     PostLogoutRedirectUris = { "https://localhost:5002/signout-callback-oidc" },
 
+                    AllowOfflineAccess = true,
+
                     AllowedScopes = new List<string>
                     {
                         IdentityServerConstants.StandardScopes.OpenId,
-                        IdentityServerConstants.StandardScopes.Profile
+                        IdentityServerConstants.StandardScopes.Profile,
+                        "api1"
                     }
                 }
             };

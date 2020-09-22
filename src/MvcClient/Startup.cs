@@ -5,14 +5,13 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 
-namespace Api
+
+namespace MvcClient
 {
     public class Startup
     {
@@ -26,27 +25,29 @@ namespace Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddControllersWithViews();
 
-            services.AddAuthentication("Bearer")
-            .AddJwtBearer("Bearer", options =>
-            {
-                options.Authority = "https://localhost:5001";
+            JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
 
-                options.TokenValidationParameters = new TokenValidationParameters
+            services.AddAuthentication(options =>
                 {
-                    ValidateAudience = false
-                };
-            });
-
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("ApiScope", policy =>
+                    options.DefaultScheme = "Cookies";
+                    options.DefaultChallengeScheme = "oidc";
+                })
+                .AddCookie("Cookies")
+                .AddOpenIdConnect("oidc", options =>
                 {
-                    policy.RequireAuthenticatedUser();
-                    policy.RequireClaim("scope", new[] { "api1"});
+                    options.Authority = "https://localhost:5001";
+
+                    options.ClientId = "mvc";
+                    options.ClientSecret = "secret";
+                    options.ResponseType = "code";
+
+                    options.SaveTokens = true;
+                    options.Scope.Add("api1");
+                    options.Scope.Add("offline_access");
                 });
-            });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -56,8 +57,14 @@ namespace Api
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            else
+            {
+                app.UseExceptionHandler("/Home/Error");
+                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseHsts();
+            }
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
 
             app.UseRouting();
 
@@ -66,7 +73,8 @@ namespace Api
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
+                endpoints.MapDefaultControllerRoute()
+                .RequireAuthorization();
             });
         }
     }
